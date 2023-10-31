@@ -33,11 +33,10 @@ class MyTableModel extends AbstractTableModel{
         List<String> rowItem = data.get(row);
         return rowItem.get(col);
     }
-    public void setValueAt(Object value, int row, int col) {
-        data[row][col] = value;
-        this.fireTableCellUpdated(row, col);
-    } 
-
+    public List<String> getRowData(int rowIndex){
+        return data.get(rowIndex);
+    }
+    
     public void add (ArrayList<String> value){
         data.add(value);
         fireTableRowsInserted(data.size() - 1, data.size() - 1);
@@ -47,11 +46,13 @@ class MyTableModel extends AbstractTableModel{
         return false;
     }
     
-    public void removeRow(int row, int col){
-       List<String> rowItem = data.get(row);
+    public void updateRow(int rowIndex, ArrayList<String> updateData){
+        data.set(rowIndex, updateData);
+        fireTableRowsUpdated(rowIndex, rowIndex);
     }
         
-}
-
-
+    public void removeRow(int rowIndex){
+       data.remove(rowIndex);
+       fireTableRowsDeleted(rowIndex, rowIndex);
+    }
 }

@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import javax.swing.*;
 import java.io.*;
+import java.util.List;
 
 /**
  *
@@ -18,14 +19,19 @@ import java.io.*;
 // Berfungsi untuk membuat bingkai (frame) baru pada GUI Java
 public class StudiKasus extends JFrame{
     public StudiKasus(){
+//        Berfungsi menambahkan listener pada Windows atau jendela
         addWindowListener(new WindowAdapter() {
+//            Berfungsi untuk menutup jendela saat mengklik tombol X pada jendela 
             public void windowClosing(WindowEvent e) {
+//                Jika klik tombol exit (X) akan tampil pesan
                 int exit = JOptionPane.showConfirmDialog(null,
                         "Apakah anda yakin ingin keluar?", "Keluar",
                         JOptionPane.YES_NO_OPTION);
+//                Jika tekan Ya, maka kita akan keluar dari jendela
                 if (exit == JOptionPane.YES_OPTION) {
                     setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                 } else {
+//                    Jika tekan tidak, maka kita akan tetap pada jendela
                     setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
                 }
             }
@@ -74,6 +80,18 @@ public class StudiKasus extends JFrame{
 //        Berfungsi untuk membuat button atau tombol
         JButton button = new JButton("Tambahkan");
         button.setBounds(15,340,110,40);
+
+//        Berfungsi untuk membuat button atau tombol   
+        JButton editButton = new JButton("Edit");
+        editButton.setBounds(135, 340, 110, 40);
+        
+//        Berfungsi untuk membuat button atau tombol   
+        JButton hapusButton = new JButton("Hapus");
+        hapusButton.setBounds(255, 340, 110, 40);
+        
+//        Berfungsi untuk membuat button atau tombol   
+        JButton simpanFile = new JButton("Simpan ke File");
+        simpanFile.setBounds(15, 390, 350, 40);
         
 //        Berfungsi untuk membuat tabel
         javax.swing.JTable table = new JTable();
@@ -87,7 +105,7 @@ public class StudiKasus extends JFrame{
 //        Beerfungsi untuk mengatur model tabel
         table.setModel(tableModel);
         
-//        Berfungsi untuk menambahkan lstener untuk event aksi pada button 
+//        Berfungsi untuk menambahkan listener untuk event aksi pada button 
         button.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e){ 
 //                Mengisi string nama dengan apa yang diisikan pada textField
@@ -108,18 +126,22 @@ public class StudiKasus extends JFrame{
                     jenisKelamin = radioButton2.getText();
                 }
 
-//                Berfungsi untuk memunculkan pesan jika ada form yang tidak diisi
+//                Jika ada data yang kosong akan muncul pesan
                 if (nama.isEmpty() || telepon.isEmpty() || alamat.isEmpty()) {
-                    JOptionPane.showMessageDialog(StudiKasus.this, "Data tidak boleh ada yang kosong!", "Warning",
+                    JOptionPane.showMessageDialog(StudiKasus.this, "Semua Data Harus Terisi!", "Warning",
                             JOptionPane.WARNING_MESSAGE);
+//                    Jika semua data telah terisi,
                 } else {
+//                    Muncul pilihan 
                     int confirmation = JOptionPane.showConfirmDialog(StudiKasus.this,
                             "Masukan Data?", "Konfirmasi", JOptionPane.YES_NO_OPTION);
+//                    Jika Ya, maka akan menampilkan data ke arrayList pada tabel
                     if (confirmation == JOptionPane.YES_OPTION) {
                         tableModel.add(new ArrayList<>(Arrays.asList(nama, telepon, jenisKelamin, alamat)));
                         textFieldNama.setText("");
                         textFieldTelepon.setText("");
                         txtOutput.setText("");
+//                    Jika memilih Tidak pada confirm dialog akan muncul pesan
                     } else {
                         JOptionPane.showMessageDialog(StudiKasus.this, "Anda tidak memasukan data");
                     }
@@ -127,74 +149,69 @@ public class StudiKasus extends JFrame{
             }
         });
         
-                // Create the "Edit" button
-        JButton editButton = new JButton("Edit");
-        editButton.setBounds(135, 340, 110, 40);
+//        Berfungsi untuk menambahkan listener untuk event aksi pada button         
+//        Button belum berfungsi dengan baik, belum menampilkan data yang telah diedit ke tabel         
+//        Hanya memunculkan pesan konfirmasi jika kita klik tombol edit, tanpa ada perubahan pada data pada tabel        
         editButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+//                Memilih baris yang akan diedit
                 int selectedRow = table.getSelectedRow();
-
                 if (selectedRow >= 0) {
-                ArrayList<String> selectedData = data.get(selectedRow);
-                String nama = selectedData.get(0);
-                String telepon = selectedData.get(1);
-                String jenisKelamin = selectedData.get(2);
-                String alamat = selectedData.get(3);
-
-                EditForm editForm = new EditForm(nama, telepon, jenisKelamin, alamat);
-                int result = JOptionPane.showConfirmDialog(StudiKasus.this, editForm, "Edit Data", JOptionPane.OK_CANCEL_OPTION);
-
-                if (result == JOptionPane.OK_OPTION) {
-                    // Update the data with the edited values
-                    selectedData.set(0, editForm.getEditedNama());
-                    selectedData.set(1, editForm.getEditedTelepon());
-                    selectedData.set(2, editForm.getEditedJenisKelamin());
-                    selectedData.set(3, editForm.getEditedAlamat());
-
-                    // Update the table model to reflect the changes
-                }
-                } else {
-                    JOptionPane.showMessageDialog(StudiKasus.this, "Pilih baris untuk diedit", "Warning", JOptionPane.WARNING_MESSAGE);
+//                    Memasukan data pada list
+                    List<String> data = tableModel.getRowData(selectedRow);
+                    int confirmation = JOptionPane.showConfirmDialog(StudiKasus.this,
+                            "Edit data ini?", "Konfirmasi", JOptionPane.YES_NO_OPTION);
+//                    Jika memilih Ya
+                    if (confirmation == JOptionPane.YES_OPTION) {
+//                        Menampilkan text yang telah diisikan dan diubah dengan data baru 
+                        textFieldNama.setText(data.get(0));
+                        textFieldTelepon.setText(data.get(1));
+                        String jenisKelamin = data.get(2);
+                        if (jenisKelamin.equals("Laki-laki")){
+                            radioButton1.setSelected(true);
+                        } else if (jenisKelamin.equals("Perempuan")){
+                            radioButton2.setSelected(true);
+                        }
+                        txtOutput.setText(data.get(3)); 
+                    }else{
+//                       Jika memilih Tidak pada confirm dialog akan muncul pesan
+                        JOptionPane.showMessageDialog(StudiKasus.this, "Anda tidak mengedit data apapun!");
+                    }
+//                    Jika belum memilih baris yang akan diedit akan muncul pesan  
+                } else{
+                    JOptionPane.showMessageDialog(StudiKasus.this, "Pilih baris untuk diedit!");
                 }
             }
         });
 
-        // Create the "Hapus" (Delete) button
-        JButton hapusButton = new JButton("Hapus");
-        hapusButton.setBounds(255, 340, 110, 40);
+//        Berfungsi untuk menambahkan action Listener pada tombol hapus
+//        Fungsi ini telah berjalan dan bisa menghapus data yang diinginkan  
         hapusButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+//                Memilih baris mana yang akan dihapus
                 int selectedRow = table.getSelectedRow();
-
-                if (selectedRow >= 0) {
+                if (selectedRow >= 0){
                     int confirmation = JOptionPane.showConfirmDialog(StudiKasus.this,
                             "Hapus data ini?", "Konfirmasi", JOptionPane.YES_NO_OPTION);
-
+//                    Jika memilih opsi YES atau Ya, maka data pada tabel yang dipilih terhapus
                     if (confirmation == JOptionPane.YES_OPTION) {
                         tableModel.removeRow(selectedRow);
-                        data.remove(selectedRow);
-                    }
+                    } 
+//                    Jika belum memilih baris yang akan dihapus maka akan muncul pesan 
                 } else {
                     JOptionPane.showMessageDialog(StudiKasus.this, "Pilih baris untuk dihapus", "Warning", JOptionPane.WARNING_MESSAGE);
                 }
-                    }
-                });
+            }  
+        });
 
-        // Create the "Simpan ke File" button
-        JButton simpanFile = new JButton("Simpan ke File");
-        simpanFile.setBounds(15, 390, 350, 40);
+//        Berfungsi untuk membuat action Listener pada tompol Simpan File
+//        Belum diisi apa-apa dan tombol belum berfungsi
         simpanFile.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                try {
-                    ArrayList<ArrayList<String>> data = null;
-                    saveDataToFile(data);
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                }
             }
         });
         
-        this.add(headerLabel);
+        this.add(headerLabel); //Menambahkan headerLabel pada JFrame
         this.add(labelNama); //Menambahkan labelNama pada JFrame
         this.add(textFieldNama); //Menambahkan texFieldNama pada JFrame
         this.add(labelTelepon); //Menambahkan labelTelepon pada JFrame
@@ -202,33 +219,19 @@ public class StudiKasus extends JFrame{
         this.add(labelRadio); //Menambahkan labelRadio pada JFrame
         this.add(radioButton1); //Menambahkan radioButton pada JFrame
         this.add(radioButton2); //Menambahkan radioButton2 pada JFrame
-        this.add(labelAlamat);
-        this.add(txtOutput);       
-        this.add(button); //Menambahkan button pada JFrame
+        this.add(labelAlamat); //Menambahkan labelAlamat pada JFrame
+        this.add(txtOutput); //Menambahkan txtOutput atau output untuk alamat pada JFrame
+        this.add(button); //Menambahkan tombol Tambahkan pada JFrame
         this.add(scrollableTable); //Menambahkan pane dengan scrollabelTable
-        this.add(editButton);
-        this.add(hapusButton);
-        this.add(simpanFile);
+        this.add(editButton); //Menambahkan tombol Edit pada JFrame
+        this.add(hapusButton); //Menambahkan tombol Hapus pada JFrame
+        this.add(simpanFile); //Menambahkan tombol Simpan File pada JFrame
 
 //        Berfungsi untuk membuat label untuk menampilkan suatu text 
         this.setSize(400,700);
         this.setLayout(null);       
     }
-    
-    private void saveDataToFile(ArrayList<ArrayList<String>> data) throws IOException {
-        String filename = "output.txt";
-        BufferedWriter writer = new BufferedWriter(new FileWriter(filename));
-
-        for (ArrayList<String> row : data) {
-            String line = String.join("\t", row);
-            writer.write(line);
-            writer.newLine();
-        }
-
-        writer.close();
-        JOptionPane.showMessageDialog(this, "Data saved to " + filename, "Info", JOptionPane.INFORMATION_MESSAGE);
-    }
-    
+               
 //        Berfungsi untuk menampilkan Frame dari GUI java yang telah dibuat
     public static void main(String[] args) {
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
@@ -237,11 +240,5 @@ public class StudiKasus extends JFrame{
                 b.setVisible(true);
             }
         });
-    }
-
-    private static class EditForm {
-        public EditForm(String nama, String telepon, String jenisKelamin, String alamat) {
-            return;
-        }
     }
 }
